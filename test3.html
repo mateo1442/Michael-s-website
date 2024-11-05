@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Accelerometer Demo</title>
+
+        <style>
+        .indicatorDot{
+            width: 30px;
+            height: 30px;
+            background-color: #ffab56;
+            border-radius: 50%;
+            position:fixed;
+        }
+        </style>
+
+    <script>
+        function initializeShakeDetection() {
+    let lastX = 0;
+    let lastY = 0;
+    let lastZ = 0;
+    const shakeThreshold = 10; // Reduced threshold for iOS
+    let lastShake = 0;
+    const shakeTimeout = 2500;
+    
+    window.addEventListener('devicemotion', (event) => {
+        // iOS provides acceleration with gravity
+        const acceleration = event.accelerationIncludingGravity;
+        if (!acceleration) return;
+
+        const currentTime = Date.now();
+        if (currentTime - lastShake < shakeTimeout) return;
+
+        const deltaX = Math.abs(acceleration.x - lastX);
+        const deltaY = Math.abs(acceleration.y - lastY);
+        const deltaZ = Math.abs(acceleration.z - lastZ);
+
+        if (deltaX + deltaY + deltaZ > shakeThreshold) {
+            lastShake = currentTime;
+            rollDice();
+        }
+
+        lastX = acceleration.x;
+        lastY = acceleration.y;
+        lastZ = acceleration.z;
+    });
+}
+        function getAccel(){
+    DeviceMotionEvent.requestPermission().then(response => {
+        if (response == 'granted') {
+            console.log("accelerometer permission granted");
+            // Do stuff here
+        }
+    });
+}
+    </script>
+    </head>
+    <body style="background-color:lightblue;">
+        <button id="accelPermsButton"  style="height:50px;" onclick="getAccel()"><h1>Get Accelerometer Permissions</h1></button>
+        <div class="indicatorDot" style="left:30%; top:30%;"></div>
+    </body>
+</html>
+
