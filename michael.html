@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Press a key</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: white;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div>press a key</div>
+
+    <script>
+        const sites = {
+            'a': 'https://www.poetryfoundation.org/poetrymagazine/poems/1615054/an-improvement-in-stairs',
+            'b': 'https://www.poetryfoundation.org/poems/89554/bright-tide',
+            'c': 'https://www.poetryfoundation.org/poetrymagazine/poems/1615070/collage-for-romare-bearden',
+            'd': 'https://www.poetryfoundation.org/poetrymagazine/poems/1615050/deus-ex-machina-a-ghazal',
+            'e': 'https://www.poetryfoundation.org/poems/48381/electrocuting-an-elephant',
+            'f': 'https://www.poetryfoundation.org/poetrymagazine/poems/1615038/fremde',
+            'g': 'https://www.poetryfoundation.org/poetrymagazine/browse?volume=30&issue=1&page=42',
+            'h': 'https://www.poetryfoundation.org/poetrymagazine/poems/1615064/hungry-love',
+            'i': 'https://www.poetryfoundation.org/poetrymagazine/poems/1615044/inclement-weather',
+            'j': 'https://www.poetryfoundation.org/poetrymagazine/browse?volume=122&issue=3&page=20',
+            'k': 'https://www.poetryfoundation.org/poetrymagazine/browse?volume=126&issue=2&page=40',
+            'l': 'https://www.poetryfoundation.org/poetrymagazine/poems/1615040/lay-it-bare',
+            'm': 'https://www.poetryfoundation.org/poetrymagazine/browse?volume=88&issue=2&page=3',
+            'n': 'https://www.poetryfoundation.org/poems/149653/nerve',
+            'o': 'https://www.poetryfoundation.org/poetrymagazine/poems/1615060/ornette',
+            'p': 'https://www.poetryfoundation.org/poetrymagazine/browse?volume=163&issue=2&page=38',
+            'q': 'https://www.poetryfoundation.org/poetrymagazine/browse?volume=40&issue=5&page=30',
+            'r': 'https://www.poetryfoundation.org/poems/51151/red-parade',
+            's': 'https://www.poetryfoundation.org/poetrymagazine/poems/1615036/strangers',
+            't': 'https://www.poetryfoundation.org/poetrymagazine/browse?volume=185&issue=4&page=15',
+            'u': 'https://www.poetryfoundation.org/poetrymagazine/poems/1615068/untitled',
+            'v': 'https://www.poetryfoundation.org/poems/54203/vase-poppies',
+            'w': 'https://www.poetryfoundation.org/poetrymagazine/poems/1615042/what-draws-us-together',
+            'x': 'https://www.poetryfoundation.org/poetrymagazine/poems/1615048/yolculuk',
+            'y': 'https://www.poetryfoundation.org/poetrymagazine/poems/42340/yellow-dress',
+            'z': 'https://www.poetryfoundation.org/poetrymagazine/poems/55664/zwijgen'
+        };
+
+        document.addEventListener('keydown', (event) => {
+            const key = event.key.toLowerCase();
+            if (sites[key]) {
+                window.location.href = sites[key];
+            }
+        });
+    </script>
+</body>
+</html>

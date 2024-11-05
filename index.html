@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Shake to Roll Dice</title>
     <style>
         body {
@@ -18,8 +19,9 @@
         }
 
         .dice-container {
-            display: flex;
-            gap: 20px;
+            position: relative;
+            width: 100%;
+            height: 60vh;
             margin: 20px;
         }
 
@@ -28,16 +30,136 @@
             height: 100px;
             background: white;
             border-radius: 10px;
-            display: grid;
-            grid-template: repeat(3, 1fr) / repeat(3, 1fr);
-            padding: 8px;
+            position: absolute;
+            padding: 15px;
+            box-sizing: border-box;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.1s;
         }
 
         .dot {
             background: #333;
             border-radius: 50%;
-            margin: 4px;
+            width: 18px;
+            height: 18px;
+            position: absolute;
+        }
+
+        /* Dot positions for 1 */
+        .die[data-value="1"] .dot:nth-child(1) {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Dot positions for 2 */
+        .die[data-value="2"] .dot:nth-child(1) {
+            top: 25%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .die[data-value="2"] .dot:nth-child(2) {
+            bottom: 25%;
+            right: 25%;
+            transform: translate(50%, 50%);
+        }
+
+        /* Dot positions for 3 */
+        .die[data-value="3"] .dot:nth-child(1) {
+            top: 25%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .die[data-value="3"] .dot:nth-child(2) {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .die[data-value="3"] .dot:nth-child(3) {
+            bottom: 25%;
+            right: 25%;
+            transform: translate(50%, 50%);
+        }
+
+        /* Dot positions for 4 */
+        .die[data-value="4"] .dot:nth-child(1) { 
+            top: 25%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .die[data-value="4"] .dot:nth-child(2) {
+            top: 25%;
+            right: 25%;
+            transform: translate(50%, -50%);
+        }
+        .die[data-value="4"] .dot:nth-child(3) {
+            bottom: 25%;
+            left: 25%;
+            transform: translate(-50%, 50%);
+        }
+        .die[data-value="4"] .dot:nth-child(4) {
+            bottom: 25%;
+            right: 25%;
+            transform: translate(50%, 50%);
+        }
+
+        /* Dot positions for 5 */
+        .die[data-value="5"] .dot:nth-child(1) {
+            top: 25%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .die[data-value="5"] .dot:nth-child(2) {
+            top: 25%;
+            right: 25%;
+            transform: translate(50%, -50%);
+        }
+        .die[data-value="5"] .dot:nth-child(3) {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .die[data-value="5"] .dot:nth-child(4) {
+            bottom: 25%;
+            left: 25%;
+            transform: translate(-50%, 50%);
+        }
+        .die[data-value="5"] .dot:nth-child(5) {
+            bottom: 25%;
+            right: 25%;
+            transform: translate(50%, 50%);
+        }
+
+        /* Dot positions for 6 */
+        .die[data-value="6"] .dot:nth-child(1) {
+            top: 25%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .die[data-value="6"] .dot:nth-child(2) {
+            top: 25%;
+            right: 25%;
+            transform: translate(50%, -50%);
+        }
+        .die[data-value="6"] .dot:nth-child(3) {
+            top: 50%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .die[data-value="6"] .dot:nth-child(4) {
+            top: 50%;
+            right: 25%;
+            transform: translate(50%, -50%);
+        }
+        .die[data-value="6"] .dot:nth-child(5) {
+            bottom: 25%;
+            left: 25%;
+            transform: translate(-50%, 50%);
+        }
+        .die[data-value="6"] .dot:nth-child(6) {
+            bottom: 25%;
+            right: 25%;
+            transform: translate(50%, 50%);
         }
 
         .instructions {
@@ -45,28 +167,23 @@
             padding: 20px;
             color: #666;
             font-size: 1.2em;
+            z-index: 10;
         }
 
         .roll-button {
             padding: 12px 24px;
             font-size: 1.2em;
-            background: #4CAF50;
+            background: #000000;
             color: white;
             border: none;
-            border-radius: 25px;
             cursor: pointer;
             margin-top: 20px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 10;
         }
 
-        @keyframes shake {
-            0%, 100% { transform: rotate(0deg); }
-            25% { transform: rotate(-10deg); }
-            75% { transform: rotate(10deg); }
-        }
-
-        .shaking {
-            animation: shake 0.5s ease-in-out infinite;
+        .rolling {
+            transition: none !important;
         }
     </style>
 </head>
@@ -77,81 +194,197 @@
         <div class="die" id="die2"></div>
     </div>
     <button class="roll-button" onclick="rollDice()">Roll Dice</button>
-
     <script>
-        const dicePatterns = {
-            1: [4],
-            2: [0, 8],
-            3: [0, 4, 8],
-            4: [0, 2, 6, 8],
-            5: [0, 2, 4, 6, 8],
-            6: [0, 2, 3, 5, 6, 8]
-        };
-
         function createDie(element) {
-            element.innerHTML = '';
-            for (let i = 0; i < 9; i++) {
-                const dot = document.createElement('div');
-                dot.className = 'dot';
-                dot.style.display = 'none';
-                element.appendChild(dot);
+    element.innerHTML = '';
+    for (let i = 0; i < 6; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        element.appendChild(dot);
+    }
+}
+
+function showNumber(element, number) {
+    element.setAttribute('data-value', number);
+    const dots = element.children;
+    Array.from(dots).forEach((dot, index) => {
+        dot.style.display = index < number ? 'block' : 'none';
+    });
+}
+
+function getRandomDuration() {
+    return Math.random() * 1000 + 1500;
+}
+
+function getRandomDiceValue() {
+    return Math.floor(Math.random() * 6) + 1;
+}
+
+function animate(die, duration) {
+    const container = document.querySelector('.dice-container');
+    const containerRect = container.getBoundingClientRect();
+    const dieRect = die.getBoundingClientRect();
+    
+    let startTime = null;
+    let prevX = parseFloat(die.style.left);
+    let prevY = parseFloat(die.style.top);
+    let velocityX = (Math.random() - 0.5) * 15;
+    let velocityY = (Math.random() - 0.5) * 15;
+    let rotation = 0;
+    let rotationSpeed = (Math.random() * 20) - 10;
+    let lastBounceTime = 0;
+    const minTimeBetweenBounces = 100;
+
+    function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const progress = timestamp - startTime;
+
+        if (progress < duration) {
+            let newX = prevX + velocityX;
+            let newY = prevY + velocityY;
+            let bounced = false;
+
+            if (newX <= 0 || newX >= containerRect.width - dieRect.width) {
+                velocityX *= -0.8;
+                newX = Math.max(0, Math.min(newX, containerRect.width - dieRect.width));
+                bounced = true;
             }
-        }
-
-        function showNumber(element, number) {
-            const dots = element.children;
-            Array.from(dots).forEach((dot, index) => {
-                dot.style.display = dicePatterns[number].includes(index) ? 'block' : 'none';
-            });
-        }
-
-        function rollDice() {
-            const dice = document.querySelectorAll('.die');
-            dice.forEach(die => die.classList.add('shaking'));
-
-            setTimeout(() => {
-                const roll1 = Math.floor(Math.random() * 6) + 1;
-                const roll2 = Math.floor(Math.random() * 6) + 1;
-                
-                showNumber(document.getElementById('die1'), roll1);
-                showNumber(document.getElementById('die2'), roll2);
-                
-                dice.forEach(die => die.classList.remove('shaking'));
-            }, 1000);
-        }
-
-        // Initialize dice
-        createDie(document.getElementById('die1'));
-        createDie(document.getElementById('die2'));
-        showNumber(document.getElementById('die1'), 1);
-        showNumber(document.getElementById('die2'), 1);
-
-        // Shake detection
-        let lastX = 0;
-        let lastY = 0;
-        let lastZ = 0;
-        const shakeThreshold = 15;
-        let lastShake = 0;
-        const shakeTimeout = 1000;
-
-        window.addEventListener('devicemotion', (event) => {
-            const current = event.accelerationIncludingGravity;
-            if (!current) return;
-
-            const deltaX = Math.abs(current.x - lastX);
-            const deltaY = Math.abs(current.y - lastY);
-            const deltaZ = Math.abs(current.z - lastZ);
-
-            if ((deltaX > shakeThreshold || deltaY > shakeThreshold || deltaZ > shakeThreshold) &&
-                (Date.now() - lastShake > shakeTimeout)) {
-                rollDice();
-                lastShake = Date.now();
+            if (newY <= 0 || newY >= containerRect.height - dieRect.height) {
+                velocityY *= -0.8;
+                newY = Math.max(0, Math.min(newY, containerRect.height - dieRect.height));
+                bounced = true;
             }
 
-            lastX = current.x;
-            lastY = current.y;
-            lastZ = current.z;
-        });
+            if ((bounced || Math.abs(rotationSpeed) > 5) && 
+                (timestamp - lastBounceTime > minTimeBetweenBounces)) {
+                showNumber(die, getRandomDiceValue());
+                lastBounceTime = timestamp;
+            }
+
+            velocityY += 0.5;
+            velocityX *= 0.99;
+            velocityY *= 0.99;
+
+            rotation += rotationSpeed;
+            rotationSpeed *= 0.99;
+
+            die.style.left = `${newX}px`;
+            die.style.top = `${newY}px`;
+            die.style.transform = `rotate(${rotation}deg)`;
+
+            prevX = newX;
+            prevY = newY;
+
+            requestAnimationFrame(step);
+        } else {
+            die.style.transition = 'all 0.3s ease-out';
+            die.style.transform = 'rotate(0deg)';
+            
+            const centerX = containerRect.width / 2;
+            const offset = die.id === 'die1' ? -120 : 20;
+            die.style.left = `${centerX + offset}px`;
+            die.style.top = `${containerRect.height / 2 - 50}px`;
+        }
+    }
+
+    die.classList.add('rolling');
+    requestAnimationFrame(step);
+}
+
+function rollDice() {
+    const dice = [document.getElementById('die1'), document.getElementById('die2')];
+    const durations = [getRandomDuration(), getRandomDuration()];
+    
+    dice.forEach((die, index) => {
+        die.style.transition = 'none';
+        animate(die, durations[index]);
+    });
+
+    const maxDuration = Math.max(...durations);
+    setTimeout(() => {
+        const roll1 = Math.floor(Math.random() * 6) + 1;
+        const roll2 = Math.floor(Math.random() * 6) + 1;
+        
+        showNumber(dice[0], roll1);
+        showNumber(dice[1], roll2);
+        
+        dice.forEach(die => die.classList.remove('rolling'));
+    }, maxDuration);
+}
+
+// iOS requires permission for motion sensors
+function requestMotionPermission() {
+    if (typeof DeviceMotionEvent.requestPermission === 'function') {
+        // iOS 13+ requires permission
+        DeviceMotionEvent.requestPermission()
+            .then(permissionState => {
+                if (permissionState === 'granted') {
+                    initializeShakeDetection();
+                } else {
+                    alert('We need motion permission to detect shaking for the dice roll!');
+                }
+            })
+            .catch(console.error);
+    } else {
+        // No permission needed (non iOS device or older iOS)
+        initializeShakeDetection();
+    }
+}
+
+function initializeShakeDetection() {
+    let lastX = 0;
+    let lastY = 0;
+    let lastZ = 0;
+    const shakeThreshold = 10; // Reduced threshold for iOS
+    let lastShake = 0;
+    const shakeTimeout = 2500;
+    
+    window.addEventListener('devicemotion', (event) => {
+        // iOS provides acceleration with gravity
+        const acceleration = event.accelerationIncludingGravity;
+        if (!acceleration) return;
+
+        const currentTime = Date.now();
+        if (currentTime - lastShake < shakeTimeout) return;
+
+        const deltaX = Math.abs(acceleration.x - lastX);
+        const deltaY = Math.abs(acceleration.y - lastY);
+        const deltaZ = Math.abs(acceleration.z - lastZ);
+
+        if (deltaX + deltaY + deltaZ > shakeThreshold) {
+            lastShake = currentTime;
+            rollDice();
+        }
+
+        lastX = acceleration.x;
+        lastY = acceleration.y;
+        lastZ = acceleration.z;
+    });
+}
+
+// Add click handler to request permission
+document.querySelector('.roll-button').addEventListener('click', function(e) {
+    rollDice();
+    // Request motion permission on first click for iOS
+    requestMotionPermission();
+});
+
+// Initialize dice
+createDie(document.getElementById('die1'));
+createDie(document.getElementById('die2'));
+showNumber(document.getElementById('die1'), 1);
+showNumber(document.getElementById('die2'), 1);
+
+// Position dice initially
+const container = document.querySelector('.dice-container');
+const containerRect = container.getBoundingClientRect();
+const die1 = document.getElementById('die1');
+const die2 = document.getElementById('die2');
+
+die1.style.left = `${containerRect.width / 2 - 120}px`;
+die1.style.top = `${containerRect.height / 2 - 50}px`;
+die2.style.left = `${containerRect.width / 2 + 20}px`;
+die2.style.top = `${containerRect.height / 2 - 50}px`;
     </script>
 </body>
 </html>
