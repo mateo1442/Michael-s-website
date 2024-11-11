@@ -45,6 +45,7 @@
         lastZ = acceleration.z;
     });
 }
+
         function getAccel(){
     DeviceMotionEvent.requestPermission().then(response => {
         if (response == 'granted') {
