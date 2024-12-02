@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Shake to Roll Dice - Dark Edition</title>
+    <style>
+        /* Previous styles remain unchanged */
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #f0f0f0;
+            overflow: hidden;
+        }
+
+        .permissions-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            text-align: center;
+            z-index: 100;
+        }
+
+        .permissions-button {
+            padding: 12px 24px;
+            font-size: 1.2em;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        .permissions-granted {
+            color: #4CAF50;
+            font-size: 1.2em;
+            margin: 10px;
+        }
+
+        .dice-container {
+            position: relative;
+            width: 100%;
+            height: 60vh;
+            margin: 20px;
+        }
+
+        .die {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 10px;
+            position: absolute;
+            padding: 15px;
+            box-sizing: border-box;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.1s, background-color 0.5s;
+        }
+
+        .dot {
+            background: black;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            position: absolute;
+        }
+
+        /* Previous dot positions CSS remains unchanged */
+        .die[data-value="1"] .dot:nth-child(1) {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .die[data-value="2"] .dot:nth-child(1) {
+            top: 25%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .die[data-value="2"] .dot:nth-child(2) {
+            bottom: 25%;
+            right: 25%;
+            transform: translate(50%, 50%);
+        }
+
+        .die[data-value="3"] .dot:nth-child(1) {
+            top: 25%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .die[data-value="3"] .dot:nth-child(2) {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .die[data-value="3"] .dot:nth-child(3) {
+            bottom: 25%;
+            right: 25%;
+            transform: translate(50%, 50%);
+        }
+
+        .die[data-value="4"] .dot:nth-child(1) { 
+            top: 25%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .die[data-value="4"] .dot:nth-child(2) {
+            top: 25%;
+            right: 25%;
+            transform: translate(50%, -50%);
+        }
+        .die[data-value="4"] .dot:nth-child(3) {
+            bottom: 25%;
+            left: 25%;
+            transform: translate(-50%, 50%);
+        }
+        .die[data-value="4"] .dot:nth-child(4) {
+            bottom: 25%;
+            right: 25%;
+            transform: translate(50%, 50%);
+        }
+
+        .die[data-value="5"] .dot:nth-child(1) {
+            top: 25%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .die[data-value="5"] .dot:nth-child(2) {
+            top: 25%;
+            right: 25%;
+            transform: translate(50%, -50%);
+        }
+        .die[data-value="5"] .dot:nth-child(3) {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .die[data-value="5"] .dot:nth-child(4) {
+            bottom: 25%;
+            left: 25%;
+            transform: translate(-50%, 50%);
+        }
+        .die[data-value="5"] .dot:nth-child(5) {
+            bottom: 25%;
+            right: 25%;
+            transform: translate(50%, 50%);
+        }
+
+        .die[data-value="6"] .dot:nth-child(1) {
+            top: 25%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .die[data-value="6"] .dot:nth-child(2) {
+            top: 25%;
+            right: 25%;
+            transform: translate(50%, -50%);
+        }
+        .die[data-value="6"] .dot:nth-child(3) {
+            top: 50%;
+            left: 25%;
+            transform: translate(-50%, -50%);
+        }
+        .die[data-value="6"] .dot:nth-child(4) {
+            top: 50%;
+            right: 25%;
+            transform: translate(50%, -50%);
+        }
+        .die[data-value="6"] .dot:nth-child(5) {
+            bottom: 25%;
+            left: 25%;
+            transform: translate(-50%, 50%);
+        }
+        .die[data-value="6"] .dot:nth-child(6) {
+            bottom: 25%;
+            right: 25%;
+            transform: translate(50%, 50%);
+        }
+
+        .instructions {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-size: 1.2em;
+            z-index: 10;
+        }
+
+        .roll-button {
+            padding: 12px 24px;
+            font-size: 1.2em;
+            background: #000000;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .rolling {
+            transition: none !important;
+        }
+
+        .rolls-counter {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            color: black;
+            font-size: 1.2em;
+        }
+
+        .reset-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 20px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2em;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="permissions-container" id="permissionsContainer">
+        <h2>Enable Shake to Roll</h2>
+        <button class="permissions-button" onclick="requestMotionPermission()">Grant Motion Access</button>
+    </div>
+
+
+    <div class="rolls-counter">Rolls: <span id="rollCount">0</span>/7</div>
+    <div class="instructions"></div>
+    <div class="dice-container">
+        <div class="die" id="die1"></div>
+        <div class="die" id="die2"></div>
+    </div>
+    <button class="roll-button" onclick="rollDice()">Roll Dice</button>
+
+    <script>
+        let motionPermissionGranted = false;
+        let rollCount = 0;
+        const MAX_ROLLS = 7;
+        let isRolling = false;
+
+        // Load saved state from sessionStorage
+        function loadGameState() {
+            const savedState = sessionStorage.getItem('diceGameState');
+            if (savedState) {
+                const state = JSON.parse(savedState);
+                rollCount = state.rollCount;
+                document.getElementById('rollCount').textContent = rollCount;
+                updateDiceDarkness();
+                
+                if (state.dice) {
+                    showNumber(document.getElementById('die1'), state.dice.die1);
+                    showNumber(document.getElementById('die2'), state.dice.die2);
+                }
+            }
+        }
+
+        // Save current state to sessionStorage
+        function saveGameState(die1Value, die2Value) {
+            const gameState = {
+                rollCount: rollCount,
+                dice: {
+                    die1: die1Value,
+                    die2: die2Value
+                }
+            };
+            sessionStorage.setItem('diceGameState', JSON.stringify(gameState));
+        }
+
+        function resetGame() {
+            rollCount = 0;
+            document.getElementById('rollCount').textContent = rollCount;
+            updateDiceDarkness();
+            showNumber(document.getElementById('die1'), 1);
+            showNumber(document.getElementById('die2'), 1);
+            sessionStorage.removeItem('diceGameState');
+        }
+
+        function updateDiceDarkness() {
+            const dice = document.querySelectorAll('.die');
+            const darkness = rollCount / MAX_ROLLS;
+            const rgbValue = Math.round(255 * (1 - darkness));
+            dice.forEach(die => {
+                die.style.backgroundColor = `rgb(${rgbValue}, ${rgbValue}, ${rgbValue})`;
+            });
+        }
+
+        // Previous functions remain largely unchanged
+        function requestMotionPermission() {
+            if (typeof DeviceMotionEvent.requestPermission === 'function') {
+                DeviceMotionEvent.requestPermission()
+                    .then(response => {
+                        if (response === 'granted') {
+                            motionPermissionGranted = true;
+                            initializeShakeDetection();
+                            hidePermissionsButton();
+                        } else {
+                            alert('Motion access is required for shake detection!');
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                motionPermissionGranted = true;
+                initializeShakeDetection();
+                hidePermissionsButton();
+            }
+        }
+
+        function hidePermissionsButton() {
+            const container = document.getElementById('permissionsContainer');
+            container.innerHTML = '<p class="permissions-granted">✓ Motion Access Granted</p>';
+            setTimeout(() => {
+                container.style.display = 'none';
+            }, 2000);
+        }
+
+        function createDie(element) {
+            element.innerHTML = '';
+            for (let i = 0; i < 6; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                element.appendChild(dot);
+            }
+        }
+
+        function showNumber(element, number) {
+            element.setAttribute('data-value', number);
+            const dots = element.children;
+            Array.from(dots).forEach((dot, index) => {
+                dot.style.display = index < number ? 'block' : 'none';
+            });
+        }
+
+        function getRandomDuration() {
+            return Math.random() * 1000 + 1500;
+        }
+
+        function getRandomDiceValue() {
+            return Math.floor(Math.random() * 6) + 1;
+        }
+
+        function animate(die, duration) {
+            const container = document.querySelector('.dice-container');
+            const containerRect = container.getBoundingClientRect();
+            const dieRect = die.getBoundingClientRect();
+            
+            let startTime = null;
+            let prevX = parseFloat(die.style.left) || 0;
+            let prevY = parseFloat(die.style.top) || 0;
+            let velocityX = (Math.random() - 0.5) * 15;
+            let velocityY = (Math.random() - 0.5) * 15;
+            let rotation = 0;
+            let rotationSpeed = (Math.random() * 20) - 10;
+            let lastBounceTime = 0;
+            const minTimeBetweenBounces = 100;
+
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                const progress = timestamp - startTime;
+
+                if (progress < duration) {
+                    let newX = prevX + velocityX;
+                    let newY = prevY + velocityY;
+                    let bounced = false;
+
+                    if (newX <= 0 || newX >= containerRect.width - dieRect.width) {
+                        velocityX *= -0.8;
+                        newX = Math.max(0, Math.min(newX, containerRect.width - dieRect.width));
+                        bounced = true;
+                    }
+                    if (newY <= 0 || newY >= containerRect.height - dieRect.height) {
+                        velocityY *= -0.8;
+                        newY = Math.max(0, Math.min(newY, containerRect.height - dieRect.height));
+                        bounced = true;
+                    }
+
+                    if ((bounced || Math.abs(rotationSpeed) > 5) && 
+                        (timestamp - lastBounceTime > minTimeBetweenBounces)) {
+                        showNumber(die, getRandomDiceValue());
+                        lastBounceTime = timestamp;
+                    }
+
+                    velocityY += 0.5;
+                    velocityX *= 0.99;
+                    velocityY *= 0.99;
+
+                    rotation += rotationSpeed;
+                    rotationSpeed *= 0.99;
+
+                    die.style.left = `${newX}px`;
+                    die.style.top = `${newY}px`;
+                    die.style.transform = `rotate(${rotation}deg)`;
+
+                    prevX = newX;
+                    prevY = newY;
+
+                    requestAnimationFrame(step);
+                } else {
+                    die.style.transition = 'all 0.3s ease-out';
+                    die.style.transform = 'rotate(0deg)';
+                    
+                    const centerX = containerRect.width / 2;
+                    const offset = die.id === 'die1' ? -120 : 20;
+                    die.style.left = `${centerX + offset}px`;
+                    die.style.top = `${containerRect.height / 2 - 50}px`;
+                }
+            }
+
+            die.classList.add('rolling');
+            requestAnimationFrame(step);
+        }
+
+        function rollDice() {
+            if (rollCount >= MAX_ROLLS || isRolling) {
+                return;
+            }
+
+            isRolling = true;
+            rollCount++;
+            document.getElementById('rollCount').textContent = rollCount;
+            updateDiceDarkness();
+
+            const dice = [document.getElementById('die1'), document.getElementById('die2')];
+            const durations = [getRandomDuration(), getRandomDuration()];
+            
+            dice.forEach((die, index) => {
+                die.style.transition = 'none';
+                animate(die, durations[index]);
+            });
+
+            const maxDuration = Math.max(...durations);
+            setTimeout(() => {
+                const roll1 = getRandomDiceValue();
+                const roll2 = getRandomDiceValue();
+                
+                showNumber(dice[0], roll1);
+                showNumber(dice[1], roll2);
+                
+                // Save the state after each roll
+                saveGameState(roll1, roll2);
+                
+                dice.forEach(die => die.classList.remove('rolling'));
+                isRolling = false;
+            }, maxDuration);
+        }
+
+        function initializeShakeDetection() {
+            let lastX = 0;
+            let lastY = 0;
+            let lastZ = 0;
+            const shakeThreshold = 25;
+            let lastShake = 0;
+            const shakeTimeout = 2500;
+            
+            window.addEventListener('devicemotion', (event) => {
+                if (!motionPermissionGranted || isRolling) return;
+                
+                const acceleration = event.accelerationIncludingGravity;
+                if (!acceleration) return;
+
+                const currentTime = Date.now();
+                if (currentTime - lastShake < shakeTimeout) return;
+
+                const deltaX = Math.abs(acceleration.x - lastX);
+                const deltaY = Math.abs(acceleration.y - lastY);
+                const deltaZ = Math.abs(acceleration.z - lastZ);
+
+                if (deltaX + deltaY + deltaZ > shakeThreshold) {
+                    lastShake = currentTime;
+                    if (rollCount < MAX_ROLLS) {
+                        rollDice();
+                    }
+                }
+
+                lastX = acceleration.x;
+                lastY = acceleration.y;
+                lastZ = acceleration.z;
+            });
+        }
+
+        // Initialize dice
+        createDie(document.getElementById('die1'));
+        createDie(document.getElementById('die2'));
+
+        // Load saved state or set initial state
+        loadGameState();
+        if (rollCount === 0) {
+            showNumber(document.getElementById('die1'), 1);
+            showNumber(document.getElementById('die2'), 1);
+        }
+
+        // Position dice initially
+        const container = document.querySelector('.dice-container');
+        const containerRect = container.getBoundingClientRect();
+        const die1 = document.getElementById('die1');
+        const die2 = document.getElementById('die2');
+        die1.style.left = `${containerRect.width / 2 - 120}px`;
+        die1.style.top = `${containerRect.height / 2 - 50}px`;
+        die2.style.left = `${containerRect.width / 2 + 20}px`;
+        die2.style.top = `${containerRect.height / 2 - 50}px`;
+
+        // Check if we're on iOS and show/hide permissions button accordingly
+        if (typeof DeviceMotionEvent.requestPermission !== 'function') {
+            document.getElementById('permissionsContainer').style.display = 'none';
+            motionPermissionGranted = true;
+            initializeShakeDetection();
+        }
+    </script>
+</body>
+</html>
